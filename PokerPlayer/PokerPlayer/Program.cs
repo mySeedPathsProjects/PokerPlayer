@@ -30,7 +30,7 @@ namespace PokerPlayer
     class PokerPlayer
     {
         // List of cards
-        public List<Card> CurrentHand { get; set; }
+        public List<Card> Hand { get; set; }
         
         // Enum of different hand types
         public enum HandType
@@ -43,34 +43,15 @@ namespace PokerPlayer
         {
             get
             {
-                if (HasRoyalFlush())
-                {
-                    return HandType.RoyalFlush;
-                } if (HasStraightFlush())
-                {
-                    return HandType.StraightFlush;
-                } if (HasFourOfAKind())
-                {
-                    return HandType.FourOfAKind;
-                } if (HasFullHouse())
-                {
-                    return HandType.FullHouse;
-                } if (HasFlush())
-                {
-                    return HandType.Flush;
-                } if (HasStraight())
-                {
-                    return HandType.Straight;
-                } if (HasThreeOfAKind())
-                {
-                    return HandType.ThreeOfAKind;
-                } if (HasTwoPair())
-                {
-                    return HandType.TwoPair;
-                } if (HasPair())
-                {
-                    return HandType.OnePair;
-                }
+                if (HasRoyalFlush()){return HandType.RoyalFlush;} 
+                if (HasStraightFlush()){return HandType.StraightFlush;}
+                if (HasFourOfAKind()){return HandType.FourOfAKind;}
+                if (HasFullHouse()){return HandType.FullHouse;} 
+                if (HasFlush()){return HandType.Flush;}
+                if (HasStraight()){return HandType.Straight;}
+                if (HasThreeOfAKind()){return HandType.ThreeOfAKind;}
+                if (HasTwoPair()){return HandType.TwoPair;}
+                if (HasPair()){return HandType.OnePair;}
                 return HandType.HighCard;
             }
         }
@@ -81,13 +62,13 @@ namespace PokerPlayer
         //get a list of Cards to form a "hand"
         public void DrawHand(List<Card> currentHand)
         {
-            this.CurrentHand = currentHand;
+            this.Hand = currentHand;
         }
 
         //print to console the suit and rank of each card in hand, and the handrank
         public void ShowHand()
         {
-            foreach (Card card in this.CurrentHand)
+            foreach (Card card in this.Hand)
             {
                 Console.WriteLine(card.Rank + " " + card.Suit);
             }
@@ -97,32 +78,33 @@ namespace PokerPlayer
         //functions to check HandRank
         public bool HasPair()
         {
-            return (this.CurrentHand.GroupBy(x => x.Rank).Count(x => x.Count() == 2) == 1);
+            return (this.Hand.GroupBy(x => x.Rank).Count(x => x.Count() == 2) == 1);
         }
         public bool HasTwoPair()
         {
-            return (this.CurrentHand.GroupBy(x => x.Rank).Count(x => x.Count() == 2) == 2);
+            return (this.Hand.GroupBy(x => x.Rank).Count(x => x.Count() == 2) == 2);
         }
         public bool HasThreeOfAKind()
         {
-            return (this.CurrentHand.GroupBy(x => x.Rank).Count(x => x.Count() == 3) == 1) && !HasPair();
+            return (this.Hand.GroupBy(x => x.Rank).Count(x => x.Count() == 3) == 1);
         }
         public bool HasStraight()
         {
-            return (this.CurrentHand.GroupBy(x => x.Rank).Count() == this.CurrentHand.Count) && (((this.CurrentHand.Max(x => x.Rank)) - (this.CurrentHand.Min(x => x.Rank))) == 4);
+    //****need to have "if statement" for a low Ace, see Dustin's solution
+            return (this.Hand.GroupBy(x => x.Rank).Count() == this.Hand.Count) && (((this.Hand.Max(x => x.Rank)) - (this.Hand.Min(x => x.Rank))) == 4);
         }
         public bool HasFlush()
         {
-            return (this.CurrentHand.Select(x => x.Suit).Distinct().Count() == 1);
+            return (this.Hand.Select(x => x.Suit).Distinct().Count() == 1);
         }
         public bool HasFullHouse()
         {
-            return (this.CurrentHand.GroupBy(x => x.Rank).Count(x => x.Count() == 3) == 1) && HasPair();
+            return HasThreeOfAKind() && HasPair();
         }
         public bool HasFourOfAKind()
         {
-            return ((this.CurrentHand.GroupBy(x => x.Rank).Count(x => x.Count() == 4) == 1) 
-                && (this.CurrentHand.GroupBy(x => x.Rank).OrderByDescending(x => x.Count()).First().Select(x => x.Suit).Distinct().Count() == 4));
+            return ((this.Hand.GroupBy(x => x.Rank).Count(x => x.Count() == 4) == 1) 
+                && (this.Hand.GroupBy(x => x.Rank).OrderByDescending(x => x.Count()).First().Select(x => x.Suit).Distinct().Count() == 4));
         }
         public bool HasStraightFlush()
         {
@@ -130,7 +112,7 @@ namespace PokerPlayer
         }
         public bool HasRoyalFlush()
         {
-            return ((HasStraightFlush()) && (this.CurrentHand.OrderByDescending(x => x.Rank).First().Rank == Rank.Ace));
+            return ((HasStraightFlush()) && (this.Hand.Max(x => x.Rank) == Rank.Ace));
         }
     }
 
